@@ -25,6 +25,9 @@ type Library struct {
 	// cflags returns the C flags specific to this library
 	cflags func(target, headerPath string) []string
 
+	// cflagsForFile returns additional C flags for a particular source file.
+	cflagsForFile func(path string) []string
+
 	// The source directory.
 	sourceDir func() string
 
@@ -227,6 +230,7 @@ func (l *Library) load(config *compileopts.Config, tmpdir string, needLibc bool)
 	}
 	for _, path := range paths {
 		// Strip leading "../" parts off the path.
+		path := path
 		cleanpath := path
 		for strings.HasPrefix(cleanpath, "../") {
 			cleanpath = cleanpath[3:]
@@ -240,6 +244,9 @@ func (l *Library) load(config *compileopts.Config, tmpdir string, needLibc bool)
 			run: func(*compileJob) error {
 				var compileArgs []string
 				compileArgs = append(compileArgs, args...)
+				if l.cflagsForFile != nil {
+					compileArgs = append(compileArgs, l.cflagsForFile(path)...)
+				}
 				compileArgs = append(compileArgs, "-o", objpath, srcpath)
 				if config.Options.PrintCommands != nil {
 					config.Options.PrintCommands("clang", compileArgs...)
