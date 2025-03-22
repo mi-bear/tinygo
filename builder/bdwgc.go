@@ -24,6 +24,7 @@ var BoehmGC = Library{
 			"-DALL_INTERIOR_POINTERS",  // scan interior pointers (needed for Go)
 			"-DIGNORE_DYNAMIC_LOADING", // we don't support dynamic loading at the moment
 			"-DNO_GETCONTEXT",          // musl doesn't support getcontext()
+			"-DGC_DISABLE_INCREMENTAL", // don't mess with SIGSEGV and such
 
 			// Special flag to work around the lack of __data_start in ld.lld.
 			// TODO: try to fix this in LLVM/lld directly so we don't have to
@@ -63,8 +64,6 @@ var BoehmGC = Library{
 			"new_hblk.c",
 			"obj_map.c",
 			"os_dep.c",
-			"pthread_stop_world.c",
-			"pthread_support.c",
 			"reclaim.c",
 		}, nil
 	},
